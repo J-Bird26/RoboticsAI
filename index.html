@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>FLL Classifier</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main>
+    <h1>FLL Image Classifier</h1>
+    <p>Use your webcam or upload a photo to see the model's predictions.</p>
+
+    <section class="controls">
+      <button id="webcamBtn">Start Webcam</button>
+      <input type="file" id="fileInput" accept="image/*" />
+    </section>
+
+    <section class="stage">
+      <video id="webcam" autoplay playsinline muted></video>
+      <img id="preview" alt="Uploaded preview" />
+      <canvas id="canvas"></canvas>
+    </section>
+
+    <section class="results">
+      <h2>Predictions</h2>
+      <ul id="predictions"></ul>
+    </section>
+  </main>
+
+  <!-- Teachable Machine Image library -->
+  <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest"></script>
+  <script src="script.js"></script>
+</body>
+</html>
