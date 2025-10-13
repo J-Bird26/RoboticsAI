@@ -1,19 +1,21 @@
-// Simple Teachable Machine site loader
-let model, maxPredictions, labelContainer, webcamEl, canvasEl, previewEl, predictionsEl, webcamStream;
+// Teachable Machine site loader with clearer error logs
+let model, maxPredictions, webcamEl, canvasEl, previewEl, predictionsEl, webcamStream;
 const MODEL_URL = "./model/";
-const MODEL_JSON = MODEL_URL + "model.json";
-const METADATA_JSON = MODEL_URL + "metadata.json";
+let MODEL_JSON = MODEL_URL + "model.json";
+let METADATA_JSON = MODEL_URL + "metadata.json";
 
 async function loadModel() {
   if (model) return model;
   try {
+    if (!window.tmImage) throw new Error("tmImage library not loaded");
+    if (!window.tf) throw new Error("TensorFlow.js not loaded");
     model = await tmImage.load(MODEL_JSON, METADATA_JSON);
     maxPredictions = model.getTotalClasses();
     console.log("Model loaded. Classes:", maxPredictions);
     return model;
   } catch (err) {
     console.error("Failed to load model:", err);
-    alert("Could not load the model files. Make sure 'model.json' and 'metadata.json' are in ./model/");
+    alert("Could not load the model files. Open the browser console for details.");
   }
 }
 
@@ -30,16 +32,19 @@ function showPredictions(preds) {
 
 async function predictFromCanvas() {
   if (!model) await loadModel();
+  if (!model) return;
   const preds = await model.predict(canvasEl);
   showPredictions(preds);
 }
 
 async function drawImageToCanvas(imgOrVideo) {
   const ctx = canvasEl.getContext("2d");
-  canvasEl.width = imgOrVideo.videoWidth || imgOrVideo.naturalWidth || 640;
-  canvasEl.height = imgOrVideo.videoHeight || imgOrVideo.naturalHeight || 480;
-  ctx.clearRect(0, 0, canvasEl.width, canvasEl.height);
-  ctx.drawImage(imgOrVideo, 0, 0, canvasEl.width, canvasEl.height);
+  const w = imgOrVideo.videoWidth || imgOrVideo.naturalWidth || 640;
+  const h = imgOrVideo.videoHeight || imgOrVideo.naturalHeight || 480;
+  canvasEl.width = w;
+  canvasEl.height = h;
+  ctx.clearRect(0, 0, w, h);
+  ctx.drawImage(imgOrVideo, 0, 0, w, h);
 }
 
 async function handleFile(e) {
@@ -64,7 +69,6 @@ async function startWebcam() {
     previewEl.style.display = "none";
     canvasEl.style.display = "block";
     await loadModel();
-    // Animation loop
     const loop = async () => {
       if (!webcamStream) return;
       await drawImageToCanvas(webcamEl);
@@ -83,7 +87,6 @@ window.addEventListener("DOMContentLoaded", () => {
   previewEl = document.getElementById("preview");
   canvasEl = document.getElementById("canvas");
   predictionsEl = document.getElementById("predictions");
-
   document.getElementById("fileInput").addEventListener("change", handleFile);
   document.getElementById("webcamBtn").addEventListener("click", startWebcam);
 });
