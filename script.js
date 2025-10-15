@@ -89,4 +89,5 @@ window.addEventListener("DOMContentLoaded", () => {
   predictionsEl = document.getElementById("predictions");
   document.getElementById("fileInput").addEventListener("change", handleFile);
   document.getElementById("webcamBtn").addEventListener("click", startWebcam);
+  window.AppInventor.setWebViewString(JSON.stringify({label: top.className, confidence:top.probability}]];
 });
